@@ -1,0 +1,49 @@
+version: '2'
+
+services:
+  mysql:
+    container_name: mysql
+    restart: always
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 'password' # TODO: Change this
+      MYSQL_USER: 'emprende24'
+      MYSQL_PASS: '3mpr3nd324'
+    volumes:
+    - mysql-volume:/var/lib/mysql
+    ports:
+    - 3306:3306
+    networks:
+    - emprende24
+
+  middleman:
+    container_name: middleman
+    build: middleman/.
+    image: daroay/middleman:v1
+    depends_on:
+    - mysql
+    ports:
+    - 4567:4567
+    links:
+    - mysql:mysql
+    restart: always
+    networks:
+    - emprende24
+
+  dbmanager:
+    container_name: dbmanager
+    build: dbmanager/.
+    image: daroay/dbmanager:v1
+    depends_on:
+    - mysql
+    links:
+    - mysql:mysql
+    networks:
+    - emprende24
+
+volumes:
+  mysql-volume:
+
+networks:
+  emprende24:
+    driver: bridge
